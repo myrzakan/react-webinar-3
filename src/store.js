@@ -56,6 +56,7 @@ class Store {
       list: [...this.state.list, newItem],
     });
   }
+
   /**
    * Удаление записи по коду
    * @param code
@@ -72,16 +73,26 @@ class Store {
    * @param code
    */
   selectItem(code) {
+    const updatedList = this.state.list.map(item => {
+      const isSelected = item.code === code;
+      return {
+        ...item,
+        selected: isSelected ? !item.selected : false,
+        selectionsCount: isSelected
+          ? (item.selectionsCount || 0) + 1
+          : item.selectionsCount || 0,
+      };
+    });
+
+    const selectionsCount = updatedList.reduce((count, item) => {
+      count[item.title] = item.selectionsCount || 0;
+      return count;
+    }, {});
+
     this.setState({
       ...this.state,
-      list: this.state.list.map(item => {
-        if (item.code === code) {
-          item.selected = !item.selected;
-        } else {
-          item.selected = false;
-        }
-        return item;
-      }),
+      list: updatedList,
+      selectionsCount: selectionsCount,
     });
   }
 }
